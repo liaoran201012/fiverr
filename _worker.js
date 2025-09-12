@@ -2,7 +2,7 @@
 // 支持：数组（推荐）或用换行/逗号/竖线分隔的字符串
 const B_URLS = [
   // 示例：
-  // "https://kiwi.tpk.mx/c3p3hsnR",
+  "http://discoverdestinations.it.com/",
   "https://kiwi.tpk.mx/c3p3hsnR"
 ];
 
@@ -171,5 +171,6 @@ function splitList(raw) {
     .map(s => s.trim())
     .filter(Boolean);
 }
+
 
 
