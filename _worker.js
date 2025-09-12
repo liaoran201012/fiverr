@@ -2,8 +2,8 @@
 // 支持：数组（推荐）或用换行/逗号/竖线分隔的字符串
 const B_URLS = [
   // 示例：
-  "http://discoverdestinations.it.com/",
-  // "https://net2.example/click?pid=456"
+  // "https://kiwi.tpk.mx/c3p3hsnR",
+  "https://kiwi.tpk.mx/c3p3hsnR"
 ];
 
 // ===================== 仅需改这里（2/2）—— Referer 配置 =====================
@@ -171,3 +171,4 @@ function splitList(raw) {
     .map(s => s.trim())
     .filter(Boolean);
 }
+
