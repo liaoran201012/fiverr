@@ -97,13 +97,7 @@
       .gallery { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
-  // 在你的index.html中添加
-<script>
-window.addEventListener('load', function() {
-  // 前端也触发一次，确保用户浏览器直接访问联盟链接
-  navigator.sendBeacon('/track' + location.search);
-});
-</script>
+  
 </head>
 <body>
   <header class="header">
@@ -259,3 +253,4 @@ window.addEventListener('load', function() {
 </body>
 
 </html> 
+
