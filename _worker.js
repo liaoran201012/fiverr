@@ -17,7 +17,7 @@ const B_REFERERS = "https://your.site/landing-a";
 //
 // ③ 按域名映射（未匹配到则回退浏览器 Referer 或不发）：
 // const B_REFERERS = { "net1.example": "https://your.site/a", "net2.example": "https://your.site/b", "*": "" };
-const B_REFERERS = ""; // <- 默认空，表示回退浏览器 Referer（或不发）
+// const B_REFERERS = ""; // <- 默认空，表示回退浏览器 Referer（或不发）
 
 // =============== 可选：高级选项（需要再改就改，不改也可直接用） ===============
 const TIMEOUT_MS = 2500;      // 单个上报请求超时（毫秒）
@@ -171,4 +171,5 @@ function splitList(raw) {
     .map(s => s.trim())
     .filter(Boolean);
 }
+
 
