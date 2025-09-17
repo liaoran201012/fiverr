@@ -8,6 +8,7 @@
 // 在这里修改你的配置
 const TRACKING_CONFIG = {
   // 跟踪目标URL - 修改为你的实际链接
+  // BASE_URL: "https://sanctuarybluecharleston.online/affiliate.html?travel=kiwi",
   BASE_URL: "https://go.fiverr.com/visit/?bta=1144346&brand=fiverrmarketplace",
   
   // 请求超时时间（毫秒）
