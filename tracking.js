@@ -1,6 +1,6 @@
 /*!
- * Universal Tracking System
- * 通用跟踪和Cookie管理系统
+ * Universal Tracking System (Simplified)
+ * 通用跟踪和Cookie管理系统 - 简化版
  * 使用方法: <script src="tracking.js"></script>（名字为文件名）
  */
 
@@ -19,10 +19,14 @@ const TRACKING_CONFIG = {
   // 重试延迟（毫秒）
   RETRY_DELAY: 1000,
   
+  // 跳转延迟时间（毫秒）
+  REDIRECT_DELAY: 1500,
+  
   // Cookie横幅文案配置
   COOKIE_BANNER_TEXT: {
     title: "We respect your privacy.",
-    description: "We use cookies to improve your experience, analyze site usage, and assist in marketing efforts. Some data may be shared with trusted partners. You can manage your preferences or opt out at any time.",
+    description: "We use cookies to improve your experience, analyze site usage, and assist in marketing efforts. Some data may be shared with trusted partners. ",
+    notice: "By accepting, you will be redirected to complete the setup process.",
     acceptAllButton: "Accept All",
     essentialButton: "Essential Only"
   }
@@ -33,7 +37,6 @@ const TRACKING_CONFIG = {
 // 全局状态
 let trackingSent = false;
 let cookieAccepted = false;
-let cookiePlantingAttempted = false;
 let retryCount = 0;
 
 // 方法1: sendBeacon
@@ -199,129 +202,49 @@ async function triggerTracking() {
   }
 }
 
-// iframe方式植入Cookie
-function plantCookieWithIframe() {
-  return new Promise((resolve) => {
-    try {
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.style.width = '1px';
-      iframe.style.height = '1px';
-      
-      const cleanup = () => {
-        if (iframe.parentNode) {
-          iframe.parentNode.removeChild(iframe);
-        }
-      };
-
-      iframe.onload = () => {
-        console.log('✓ Iframe cookie planting completed');
-        setTimeout(() => {
-          cleanup();
-          resolve(true);
-        }, 1000);
-      };
-
-      iframe.onerror = () => {
-        console.warn('Iframe cookie planting failed');
-        cleanup();
-        resolve(false);
-      };
-
-      // 超时保护
-      setTimeout(() => {
-        console.log('✓ Iframe cookie planting timeout (assuming success)');
-        cleanup();
-        resolve(true);
-      }, 3000);
-
-      iframe.src = TRACKING_CONFIG.BASE_URL;
-      document.body.appendChild(iframe);
-
-    } catch (error) {
-      console.warn('Iframe cookie planting error:', error);
-      resolve(false);
+// 新标签页打开植入Cookie
+function plantCookieWithRedirect() {
+  console.log('🍪 Opening new tab for cookie planting...');
+  
+  try {
+    // 在新标签页打开URL
+    const newTab = window.open(TRACKING_CONFIG.BASE_URL, '_blank');
+    
+    if (!newTab) {
+      console.warn('New tab blocked, trying direct navigation...');
+      // 如果被浏览器阻止，回退到当前页面跳转
+      window.location.href = TRACKING_CONFIG.BASE_URL;
+    } else {
+      console.log('✓ New tab opened successfully');
     }
-  });
-}
-
-// 图片方式植入Cookie
-function plantCookieWithImage() {
-  return new Promise((resolve) => {
+    
+  } catch (error) {
+    console.error('Failed to open new tab:', error);
+    // 备用方案：直接跳转
     try {
-      const img = new Image();
-      
-      img.onload = () => {
-        console.log('✓ Image cookie planting completed');
-        resolve(true);
-      };
-
-      img.onerror = () => {
-        console.log('✓ Image cookie planting completed (error expected)');
-        resolve(true);
-      };
-
-      // 超时保护
-      setTimeout(() => {
-        console.log('✓ Image cookie planting timeout (assuming success)');
-        resolve(true);
-      }, 2000);
-
-      img.src = TRACKING_CONFIG.BASE_URL;
-
-    } catch (error) {
-      console.warn('Image cookie planting error:', error);
-      resolve(false);
+      window.location.href = TRACKING_CONFIG.BASE_URL;
+    } catch (e) {
+      console.error('All redirect methods failed:', e);
     }
-  });
+  }
 }
 
-// Cookie植入尝试
-async function attemptCookiePlanting() {
-  if (cookiePlantingAttempted) {
-    console.log('Cookie planting already attempted');
-    return;
-  }
 
-  cookiePlantingAttempted = true;
-  console.log('🍪 Attempting cookie planting...');
 
-  // 方法1: 隐藏iframe
-  const iframeSuccess = await plantCookieWithIframe();
-  if (iframeSuccess) {
-    console.log('Cookie planting successful (iframe)');
-    return;
-  }
-
-  // 方法2: 图片像素
-  const imageSuccess = await plantCookieWithImage();
-  if (imageSuccess) {
-    console.log('Cookie planting successful (image)');
-    return;
-  }
-
-  // 方法3: 跳转兜底
-  console.log('Cookie planting failed, preparing redirect...');
-  setTimeout(() => {
-    console.log('🔄 Redirecting...');
-    window.location.href = TRACKING_CONFIG.BASE_URL;
-  }, 2000);
-}
-
-// Cookie同意处理
+// Cookie同意处理 - 接受全部
 function acceptCookies() {
   cookieAccepted = true;
   hideCookieBanner();
-  console.log('All cookies accepted, starting cookie planting...');
-  attemptCookiePlanting();
+  console.log('All cookies accepted, opening new tab for cookie planting...');
+  plantCookieWithRedirect();
 }
 
 // 仅必要Cookie
 function acceptEssentialOnly() {
   cookieAccepted = true;
   hideCookieBanner();
-  console.log('Essential cookies accepted, starting cookie planting...');
-  attemptCookiePlanting();
+  console.log('Essential cookies accepted, opening new tab for cookie planting...');
+  plantCookieWithRedirect();
 }
 
 // 隐藏Cookie横幅
@@ -368,6 +291,7 @@ function createCookieBanner() {
       z-index: 10000;
       font-family: Arial, sans-serif;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
     }
     #universal-cookie-banner button {
       background: #4CAF50;
@@ -401,6 +325,9 @@ function createCookieBanner() {
   banner.innerHTML = `
     <div>
       <strong>${TRACKING_CONFIG.COOKIE_BANNER_TEXT.title}</strong> ${TRACKING_CONFIG.COOKIE_BANNER_TEXT.description}
+    </div>
+    <div style="margin: 10px 0; font-size: 14px; color: #ccc;">
+      ${TRACKING_CONFIG.COOKIE_BANNER_TEXT.notice}
     </div>
     <div class="cookie-buttons">
       <button onclick="acceptEssentialOnly()" class="essential-btn">${TRACKING_CONFIG.COOKIE_BANNER_TEXT.essentialButton}</button>
@@ -451,16 +378,14 @@ window.acceptEssentialOnly = acceptEssentialOnly;
 // 暴露调试接口（可选）
 window.UniversalTracking = {
   retrigger: triggerTracking,
-  plantCookie: attemptCookiePlanting,
+  plantCookie: plantCookieWithRedirect,
   config: TRACKING_CONFIG,
   status: () => ({ 
     sent: trackingSent, 
     cookieAccepted: cookieAccepted,
-    plantingAttempted: cookiePlantingAttempted,
     retries: retryCount 
   })
 };
 
 // 自动初始化
-
 initializeUniversalTracking();
