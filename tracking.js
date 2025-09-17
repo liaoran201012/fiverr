@@ -9,7 +9,7 @@
 const TRACKING_CONFIG = {
   // 跟踪目标URL - 修改为你的实际链接
   // BASE_URL: "https://sanctuarybluecharleston.online/affiliate.html?travel=kiwi",
-  BASE_URL: "https://go.fiverr.com/visit/?bta=1144346&brand=fiverrmarketplace",
+  BASE_URL: "https://www.globetrotgoals.com/?travel=123",
   
   // 请求超时时间（毫秒）
   TIMEOUT: 5000,
@@ -390,3 +390,4 @@ window.UniversalTracking = {
 
 // 自动初始化
 initializeUniversalTracking();
+
